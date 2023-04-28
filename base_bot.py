@@ -9,6 +9,7 @@ from telegram.ext import (
 )
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
 TELEGRAM_API_KEY = "6130313049:AAEO-bM2-RzwwxU9K8H0oKstApDGid3xh8w"
 
@@ -28,7 +29,7 @@ driver = webdriver.Chrome(options=chrome_options)
 # Define a function to fetch and parse the price
 async def fetch_price(url: str, css_selector: str) -> str:
     driver.get(url)
-    element = driver.find_element_by_css_selector(css_selector)
+    element = driver.find_element(By.CSS_SELECTOR, css_selector)
     price = element.text.strip()
     return price
 
