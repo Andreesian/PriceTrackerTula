@@ -1,6 +1,4 @@
 import logging
-import requests
-from bs4 import BeautifulSoup
 from telegram import Update, ForceReply
 from telegram.ext import (
     Application,
@@ -9,6 +7,8 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 TELEGRAM_API_KEY = "6130313049:AAEO-bM2-RzwwxU9K8H0oKstApDGid3xh8w"
 
@@ -17,11 +17,19 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Set up Selenium
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+driver = webdriver.Chrome(options=chrome_options)
+
 # Define a function to fetch and parse the price
 async def fetch_price(url: str, css_selector: str) -> str:
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
-    price = soup.select_one(css_selector).text.strip()
+    driver.get(url)
+    element = driver.find_element_by_css_selector(css_selector)
+    price = element.text.strip()
     return price
 
 # Define a function to handle the /start command
