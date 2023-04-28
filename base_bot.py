@@ -8,8 +8,11 @@ from telegram.ext import (
     filters,
 )
 from selenium import webdriver
+from selenium_stealth import stealth
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 TELEGRAM_API_KEY = "6130313049:AAEO-bM2-RzwwxU9K8H0oKstApDGid3xh8w"
 
@@ -25,11 +28,19 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 driver = webdriver.Chrome(options=chrome_options)
+stealth(driver,
+        languages=["en-US", "en"],
+        vendor="Google Inc.",
+        platform="Win32",
+        webgl_vendor="Intel Inc.",
+        renderer="Intel Iris OpenGL Engine",
+        fix_hairline=True,
+        )
 
 # Define a function to fetch and parse the price
 async def fetch_price(url: str, css_selector: str) -> str:
     driver.get(url)
-    element = driver.find_element(By.CSS_SELECTOR, css_selector)
+    element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
     price = element.text.strip()
     return price
 
@@ -48,6 +59,8 @@ async def parse_price(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         await update.message.reply_text(f"The price is: {price}")
     except Exception as e:
         await update.message.reply_text(f"Error: {e}")
+    #driver.execute_script("window.stop();")
+    #driver.close()
 
 def main() -> None:
     application = Application.builder().token(TELEGRAM_API_KEY).build()
