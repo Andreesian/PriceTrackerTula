@@ -86,6 +86,24 @@ def delete_url(connection: psycopg2.extensions.connection, id_url: int):
         cursor.execute("DELETE FROM public.urls WHERE id_url = %s", (id_url,))
         connection.commit()
 
+def get_user_by_nickname(connection: psycopg2.extensions.connection, nickname: str) -> Optional[Tuple[int, str, List[int]]]:
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id_user, nickname, request_id FROM public.users WHERE nickname = %s", (nickname,))
+        result = cursor.fetchone()
+    return result
+
+def get_request_by_product_name(connection: psycopg2.extensions.connection, product_name: str) -> Optional[Tuple[int, str, str, List[int], int]]:
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id_request, product_name, update_time, price_history, url_id FROM public.requests WHERE product_name = %s", (product_name,))
+        result = cursor.fetchone()
+    return result
+
+def get_url_by_url(connection: psycopg2.extensions.connection, url: str) -> Optional[Tuple[int, str, str]]:
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT id_url, url, short_name FROM public.urls WHERE url = %s", (url,))
+        result = cursor.fetchone()
+    return result
+
 # Example usage
 """ connection = create_connection("sell_bot", "postgres", "Alesha2109!", "localhost", "5432")
 

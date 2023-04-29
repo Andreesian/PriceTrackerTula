@@ -39,6 +39,9 @@ async def daily_task():
         print(f"sleeped")
 
 from database import (
+    get_user_by_nickname,
+    get_request_by_product_name,
+    get_url_by_url,
     create_connection,
     close_connection,
     add_user,
@@ -170,6 +173,18 @@ def id_generator():
 
 unique_id = id_generator()
 
+async def fetch_item_name(url: str, css_selector: str) -> str:
+    driver.get(url)
+    element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+    name = element.text.strip()
+    return name
+
+async def fetch_first_item_url(url: str, css_selector: str) -> str:
+    driver.get(url)
+    element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+    price = element.text.strip()
+    return price
+
 async def fetch_price(url: str, css_selector: str) -> str:
     driver.get(url)
     element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
@@ -180,20 +195,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global connection
     user = update.effective_user
     username = user.full_name
-    add_user(connection, next(unique_id), username)
+    if get_user_by_nickname(connection, user.full_name) == None:
+        add_user(connection, next(unique_id), username)
     keyboard = [
-        [InlineKeyboardButton("📦Общее", callback_data="1")],
-        [InlineKeyboardButton("👖Одежда и обувь", callback_data="2")],
-        [InlineKeyboardButton("💄Косметика", callback_data="3")],
-        [InlineKeyboardButton("🛋️Мебель, декор", callback_data="4")],
-        [InlineKeyboardButton("🔌Оборудование и техника", callback_data="5")],
-        [InlineKeyboardButton("🧺Продукты", callback_data="6")],
-        [InlineKeyboardButton("🧸Детское", callback_data="6")],
+        [InlineKeyboardButton("📦Общее", callback_data="general")],
+        [InlineKeyboardButton("👖Одежда и обувь", callback_data="cloth")],
+        [InlineKeyboardButton("💄Косметика", callback_data="cosmetics")],
+        [InlineKeyboardButton("🛋️Мебель, декор", callback_data="decor")],
+        [InlineKeyboardButton("🔌Оборудование и техника", callback_data="tech")],
+        [InlineKeyboardButton("🧺Продукты", callback_data="groceries")],
+        [InlineKeyboardButton("🧸Детское", callback_data="child")],
+        [InlineKeyboardButton("🌐Ссылка", callback_data="link")],
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text("Выберите категорию:", reply_markup=reply_markup)
+    await update.message.reply_text("Выберите категорию либо ввод по ссылке:", reply_markup=reply_markup)
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
@@ -215,8 +232,10 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         try:
             url = update.message.text
             domain = get_domain_name(url)
-            css_selector = price_css_selectors[domain]
+            price_css_selector = price_css_selectors[domain]
+            #name_css_selector = 
             await update.message.reply_text(f"⚙Загружаем цены...")
+            name = await fetch_item_name(url, )
             price = await fetch_price(url, css_selector)
             await update.message.reply_text(f"🏷Цена товара: {price}")
             keyboard = [
@@ -240,6 +259,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     state["HELP"] = True
 
 async def start_waiting(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await daily_task()
+
+async def list_notifs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await daily_task()
 
 def main() -> None:
