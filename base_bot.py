@@ -35,6 +35,8 @@ from database import (
     delete_url
 )
 
+connection = create_connection("sell_bot", "postgres", "333221", "localhost", "5432")
+
 from urllib.parse import urlparse
 
 def get_domain_name(url):
@@ -135,7 +137,10 @@ async def fetch_price(url: str, css_selector: str) -> str:
     return price
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    global connection
     user = update.effective_user
+    username = user.full_name
+    add_user(connection, 1, username)
     keyboard = [
         [InlineKeyboardButton("Категория 1", callback_data="1")],
         [InlineKeyboardButton("Категория 2", callback_data="2")],
@@ -151,14 +156,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
+    global connection
     query = update.callback_query
     state["WANT_PRICE"] = True
 
-    # CallbackQueries need to be answered, even if no notification to the user is needed
-    # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
     await query.answer()
 
     await query.edit_message_text(text=f"Selected option: {query.data}")
+    if (query.data == "add_to_list"):
+        add_request(connection, 1, "default", "1 day", [], 1)
+        print(get_request_by_id(connection, 1))
+        update_user(connection, 1, new_request_ids=[get_request_by_id(connection, 1)[0]])
+        await query.edit_message_text(text=f"Added!")
 
 # Define a function to handle messages
 async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -167,8 +176,16 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             url = update.message.text
             domain = get_domain_name(url)
             css_selector = price_css_selectors[domain]
+            await update.message.reply_text(f"Loading the prices...")
             price = await fetch_price(url, css_selector)
             await update.message.reply_text(f"The price is: {price}")
+            await update.message.reply_text(f"Do you wish to add that product to your notify list?")
+            keyboard = [
+                [InlineKeyboardButton("Yes", callback_data="add_to_list")],
+                [InlineKeyboardButton("No", callback_data="dont_add_to_list")],
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await update.message.reply_text("Please choose:", reply_markup=reply_markup)
         except Exception as e:
             await update.message.reply_text(f"Error: {e}")
         state["WANT_PRICE"] = False
@@ -179,16 +196,6 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await update.message.reply_text(f"{text}")
         state["HELP"] = False
 
-async def present_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    try:
-        url, css_selector = update.message.text.split(" ", 1)
-        price = await fetch_price(url, css_selector)
-        await update.message.reply_text(f"The price is: {price}")
-    except Exception as e:
-        await update.message.reply_text(f"Error: {e}")
-    #driver.execute_script("window.stop();")
-    #driver.close()
-
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("I will echo text now.")
     state["HELP"] = True
@@ -197,17 +204,17 @@ async def start_waiting(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     await daily_task()
 
 def main() -> None:
+    global connection
     application = Application.builder().token(TELEGRAM_API_KEY).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
     application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("wait", start_waiting))
-
+    application.add_handler(CommandHandler("wait", start_waiting, block=False))
 
     application.run_polling()
-    connection = create_connection("sell_bot", "postgres", "333221", "localhost", "5432")
+    
 
 if __name__ == "__main__":
     main()
