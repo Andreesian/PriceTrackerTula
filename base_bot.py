@@ -104,6 +104,34 @@ search_css_selectors = {
     "pleer.ru": ".product_preview_img" #https://www.pleer.ru/search_iphone+13.html
 }
 
+image_css_selectors = {
+    "dns-shop.ru": ".product-images-slider__main-img", #https://www.dns-shop.ru/search/?q=rtx+3070&category=17a89aab16404e77
+    "wildberries.ru": ".slide__content.img-plug.j-wba-card-item", #https://www.wildberries.ru/catalog/25742723/detail.aspx
+    "ozon.ru": ".k7z.z7-a", #https://www.ozon.ru/product/robot-pylesos-polaris-pvcr-1226-wi-fi-iq-home-gyro-chernyy-672452962/?avtc=1&avte=1&avts=1682802352&sh=rDKQSuvh-w
+    "lamoda.ru": "._root_1wiwn_3._image_i5mcd_2._image_i5mcd_2", #https://www.lamoda.ru/p/rtlack938201/clothes-ea7-kostyum-sportivnyy/
+    "cdek.shopping": ".item", #https://cdek.shopping/p/60245/kroscovki-nike-air-force-1-shadow-belyi
+    "leroymerlin.ru": "#picturesWrapper", #https://leroymerlin.ru/product/ventilyator-napolnyy-monlan-mf-50sb-50-vt-52-sm-cvet-chernyy-84266575/
+    "robo.market": ".Image-module__centered__0dda.styles__activeImage__0e5d.styles__imageStyle__7186", #https://robo.market/product/1807193
+    "berito.ru": ".product__gallery-image", #https://www.berito.ru/product-plate-v-goroshek-noname-4411163/
+    "kazanexpress.ru": ".product-page-container.product-info-card.photos-container.main-photo.carousel-container.img", #delete .img if doesnt works anyw https://kazanexpress.ru/product/Belaya-krem---1742409
+    "citilink.ru": ".ekkbt9g0.app-catalog-15kpwh2.e1fcwjnh0", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
+    "pleer.ru": ".photo_self_section.a.img" #https://www.pleer.ru/_955714
+}
+
+product_name_css_selectors = {
+    "dns-shop.ru": ".product-card-top__title", #https://www.dns-shop.ru/product/bb884500ae092ff1/videokarta-palit-geforce-rtx-3070-ti-gamingpro-ned307t019p2-1046a/
+    "wildberries.ru": ".product-page__header h1", #https://www.wildberries.ru/catalog/25742723/detail.aspx
+    "ozon.ru": ".n2q", #https://www.ozon.ru/product/robot-pylesos-polaris-pvcr-1226-wi-fi-iq-home-gyro-chernyy-672452962/?avtc=1&avte=1&avts=1682802352&sh=rDKQSuvh-w
+    "lamoda.ru": "._modelName_rumwo_22", #https://www.lamoda.ru/p/rtlack938201/clothes-ea7-kostyum-sportivnyy/
+    "cdek.shopping": ".product-header-name h1", #https://cdek.shopping/p/60245/kroscovki-nike-air-force-1-shadow-belyi
+    "leroymerlin.ru": ".t12nw7s2_pdp", #https://leroymerlin.ru/product/ventilyator-napolnyy-monlan-mf-50sb-50-vt-52-sm-cvet-chernyy-84266575/
+    "robo.market": ".styles__productArticleTitle__8e33", #https://robo.market/product/1807193
+    "berito.ru": ".page-header__title", #https://www.berito.ru/product-plate-v-goroshek-noname-4411163/
+    "kazanexpress.ru": ".title", #https://kazanexpress.ru/product/Belaya-krem---1742409
+    "citilink.ru": ".e1ubbx7u0.eml1k9j0.app-catalog-tn2wxd.e1gjr6xo0", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
+    "pleer.ru": ".product_title" #https://www.pleer.ru/_653047
+}
+
 
 query_css_selectors = {
     "dns-shop.ru": "/search/?q=", #https://www.dns-shop.ru/search/?q=rtx+3070&category=17a89aab16404e77
@@ -132,7 +160,7 @@ price_css_selectors = {
     "berito.ru": ".product__price", #https://www.berito.ru/product-plate-dlya-devochki-bombino-kiki-kids-430457/
     "kazanexpress.ru": ".currency", #https://kazanexpress.ru/product/Plate-TVOE-1554788
     "citilink.ru": ".app-catalog-1f8xctp", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
-    "pleer.ru": "price" #https://www.pleer.ru/_883840
+    "pleer.ru": ".price" #https://www.pleer.ru/_883840
 }
 
 #state
