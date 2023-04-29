@@ -1,0 +1,40 @@
+create table users
+(
+    id_user    bigint not null
+        constraint id_user
+            primary key,
+    nickname   varchar(150),
+    request_id bigint[]
+);
+
+alter table users
+    owner to postgres;
+
+create table urls
+(
+    id_url     bigint not null
+        constraint id_url
+            primary key,
+    url        text,
+    short_name varchar(1000)
+);
+
+alter table urls
+    owner to postgres;
+
+create table requests
+(
+    id_request    bigint not null
+        constraint id_request
+            primary key,
+    product_name  varchar(1000),
+    update_time   interval,
+    price_history integer[],
+    url_id        bigint
+        constraint requests_urls_null_fk
+            references urls
+            on update cascade on delete cascade
+);
+
+alter table requests
+    owner to postgres;
