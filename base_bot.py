@@ -70,7 +70,7 @@ price_css_selectors = {
     "berito.ru": ".product__price", #https://www.berito.ru/product-plate-dlya-devochki-bombino-kiki-kids-430457/
     "kazanexpress.ru": ".currency", #https://kazanexpress.ru/product/Plate-TVOE-1554788
     "citilink.ru": ".app-catalog-1f8xctp", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
-    "pleer.ru": "price", #https://www.pleer.ru/_883840
+    "pleer.ru": "price", #https://www.pleer.ru/_883840 3
     "onlinetrade.ru": ".js__actualPrice" #https://www.onlinetrade.ru/catalogue/kofemashiny-c1127/delonghi/kofemashina_delonghi_perfecta_evo_esam_420.40.b_0132217046-2415126.html
 }
 
