@@ -13,6 +13,15 @@ def load_api_key(config_file):
         return config["api"]["key"]
     else:
         raise KeyError("API key not found in the configuration file")
+    
+def load_db_cfg(config_file):
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+    if "database" in config.sections() and "name" in config["database"] and "user" in config["database"] and "password" in config["database"] and "host" in config["database"] and "port" in config["database"]:
+        return [config["database"]["name"], config["database"]["user"], config["database"]["password"], config["database"]["host"], config["database"]["port"]]
+    else:
+        raise KeyError("Database config not found in the configuration file")
 
 def get_current_date():
     current_date = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
@@ -46,7 +55,7 @@ from database import (
     delete_url
 )
 
-connection = create_connection("sell_bot", "postgres", "333221", "localhost", "5432")
+
 
 from urllib.parse import urlparse
 
@@ -237,6 +246,8 @@ def main() -> None:
     global connection
     config_file = "config.cfg"
     api_key = load_api_key(config_file)
+    database_cfg = load_db_cfg(config_file)
+    connection = create_connection(database_cfg[0], database_cfg[1], database_cfg[2], database_cfg[3], database_cfg[4])
     application = Application.builder().token(api_key).build()
 
     application.add_handler(CommandHandler("start", start))
@@ -249,4 +260,5 @@ def main() -> None:
     
 
 if __name__ == "__main__":
+    
     main()
