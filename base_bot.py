@@ -130,6 +130,14 @@ state = {
     "WANT_PRICE" : False
 }
 
+def id_generator():
+    id_value = 0
+    while True:
+        yield id_value
+        id_value += 1
+
+unique_id = id_generator()
+
 async def fetch_price(url: str, css_selector: str) -> str:
     driver.get(url)
     element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
@@ -140,19 +148,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global connection
     user = update.effective_user
     username = user.full_name
-    add_user(connection, 1, username)
+    add_user(connection, next(unique_id), username)
     keyboard = [
-        [InlineKeyboardButton("Категория 1", callback_data="1")],
-        [InlineKeyboardButton("Категория 2", callback_data="2")],
-        [InlineKeyboardButton("Категория 3", callback_data="3")],
-        [InlineKeyboardButton("Категория 4", callback_data="4")],
-        [InlineKeyboardButton("Категория 5", callback_data="5")],
-        [InlineKeyboardButton("Категория 6", callback_data="6")],
+        [InlineKeyboardButton("📦Общее", callback_data="1")],
+        [InlineKeyboardButton("👖Одежда и обувь", callback_data="2")],
+        [InlineKeyboardButton("💄Косметика", callback_data="3")],
+        [InlineKeyboardButton("🛋️Мебель, декор", callback_data="4")],
+        [InlineKeyboardButton("🔌Оборудование и техника", callback_data="5")],
+        [InlineKeyboardButton("🧺Продукты", callback_data="6")],
+        [InlineKeyboardButton("🧸Детское", callback_data="6")],
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    await update.message.reply_text("Please choose:", reply_markup=reply_markup)
+    await update.message.reply_text("Выберите категорию:", reply_markup=reply_markup)
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
@@ -164,10 +173,9 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     await query.edit_message_text(text=f"Selected option: {query.data}")
     if (query.data == "add_to_list"):
-        add_request(connection, 1, "default", "1 day", [], 1)
-        print(get_request_by_id(connection, 1))
-        update_user(connection, 1, new_request_ids=[get_request_by_id(connection, 1)[0]])
-        await query.edit_message_text(text=f"Added!")
+        add_request(connection, next(unique_id), "default", "1 day", [], 1)
+        update_user(connection, next(unique_id), new_request_ids=[get_request_by_id(connection, 1)[0]])
+        await query.edit_message_text(text=f"✅Товар добавлен в ваш список уведомлений!")
 
 # Define a function to handle messages
 async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -176,16 +184,15 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             url = update.message.text
             domain = get_domain_name(url)
             css_selector = price_css_selectors[domain]
-            await update.message.reply_text(f"Loading the prices...")
+            await update.message.reply_text(f"⚙Загружаем цены...")
             price = await fetch_price(url, css_selector)
-            await update.message.reply_text(f"The price is: {price}")
-            await update.message.reply_text(f"Do you wish to add that product to your notify list?")
+            await update.message.reply_text(f"🏷Цена товара: {price}")
             keyboard = [
-                [InlineKeyboardButton("Yes", callback_data="add_to_list")],
-                [InlineKeyboardButton("No", callback_data="dont_add_to_list")],
+                [InlineKeyboardButton(f'✅Да', callback_data="add_to_list")],
+                [InlineKeyboardButton(f'❌Нет', callback_data="dont_add_to_list")],
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await update.message.reply_text("Please choose:", reply_markup=reply_markup)
+            await update.message.reply_text("🔔Желаете ли вы добавить этот товар в список ваших уведомлений?", reply_markup=reply_markup)
         except Exception as e:
             await update.message.reply_text(f"Error: {e}")
         state["WANT_PRICE"] = False
