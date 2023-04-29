@@ -68,23 +68,21 @@ state = {
     "WANT_PRICE" : False
 }
 
-# Define a function to fetch and parse the price
 async def fetch_price(url: str, css_selector: str) -> str:
     driver.get(url)
     element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
     price = element.text.strip()
     return price
 
-# Define a function to handle the /start command
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     keyboard = [
-        [InlineKeyboardButton("Option 1", callback_data="1")],
-        [InlineKeyboardButton("Option 2", callback_data="2")],
-        [InlineKeyboardButton("Option 3", callback_data="3")],
-        [InlineKeyboardButton("Option 4", callback_data="4")],
-        [InlineKeyboardButton("Option 5", callback_data="5")],
-        [InlineKeyboardButton("Option 6", callback_data="6")],
+        [InlineKeyboardButton("Категория 1", callback_data="1")],
+        [InlineKeyboardButton("Категория 2", callback_data="2")],
+        [InlineKeyboardButton("Категория 3", callback_data="3")],
+        [InlineKeyboardButton("Категория 4", callback_data="4")],
+        [InlineKeyboardButton("Категория 5", callback_data="5")],
+        [InlineKeyboardButton("Категория 6", callback_data="6")],
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
