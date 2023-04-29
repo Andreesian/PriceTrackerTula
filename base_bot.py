@@ -61,7 +61,7 @@ price_css_selectors = {
     "dns-shop.ru": ".product-buy__price",
     "wildberries.ru": ".price-block__final-price", #https://www.wildberries.ru/catalog/18139480/detail.aspx
     "ozon.ru": ".np9", #https://www.ozon.ru/product/robot-pylesos-polaris-pvcr-1226-wi-fi-iq-home-gyro-chernyy-672452962/?avtc=1&avte=1&avts=1682763165&sh=rDKQSv7rkg
-    "ozon.ru": ".n4p", #https://www.ozon.ru/product/robot-pylesos-polaris-pvcr-1226-wi-fi-iq-home-gyro-chernyy-672452962/?avtc=1&avte=1&avts=1682763165&sh=rDKQSv7rkg
+    "ozon.ru": ".n4p", #https://www.ozon.ru/product/robot-pylesos-polaris-pvcr-1226-wi-fi-iq-home-gyro-chernyy-672452962/?avtc=1&avte=1&avts=1682763165&sh=rDKQSv7rkg ww
     "lamoda.ru": "._price_t2bk4_7", #https://www.lamoda.ru/p/mp002xm08jab/clothes-colins-bryuki/
     "cdek.shopping": ".final-your-price__count", #https://cdek.shopping/p/60245/kroscovki-nike-air-force-1-shadow-belyi
     "leroymerlin.ru": "price.slot-container", #https://leroymerlin.ru/product/stul-premer-82x45x55-sm-derevo-cvet-belyy-84758318/
