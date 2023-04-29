@@ -87,7 +87,7 @@ def delete_url(connection: psycopg2.extensions.connection, id_url: int):
         connection.commit()
 
 # Example usage
-connection = create_connection("burnoutbotsell", "postgres", "Alesha2109!", "localhost", "5432")
+""" connection = create_connection("sell_bot", "postgres", "Alesha2109!", "localhost", "5432")
 
 add_user(connection, 1, "JohnDoe")
 add_url(connection, 1, "https://example.com/product1", "Product 1")
@@ -117,4 +117,4 @@ delete_user(connection, 1)
 delete_request(connection, 1)
 delete_url(connection, 1)
 
-close_connection(connection)
+close_connection(connection) """
