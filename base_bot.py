@@ -161,8 +161,9 @@ price_css_selectors = {
 #state
 state = {
     "START" : False,
-    "HELP" : False,
-    "WANT_PRICE" : False
+    "ECHO" : False,
+    "WANT_PRICE_LINK" : False,
+    "WANT_PRICE_QUERY" : False
 }
 
 def id_generator():
@@ -182,8 +183,8 @@ async def fetch_item_name(url: str, css_selector: str) -> str:
 async def fetch_first_item_url(url: str, css_selector: str) -> str:
     driver.get(url)
     element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
-    price = element.text.strip()
-    return price
+    item_url = element.text.strip()
+    return item_url
 
 async def fetch_price(url: str, css_selector: str) -> str:
     driver.get(url)
@@ -233,10 +234,11 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             url = update.message.text
             domain = get_domain_name(url)
             price_css_selector = price_css_selectors[domain]
-            #name_css_selector = 
+            #name_css_selector = name_css_selector
             await update.message.reply_text(f"⚙Загружаем цены...")
-            name = await fetch_item_name(url, )
-            price = await fetch_price(url, css_selector)
+            #name = await fetch_item_name(url, name_css_selector)
+            #await update.message.reply_text(f"🏷Название товара: {name}")
+            price = await fetch_price(url, price_css_selector)
             await update.message.reply_text(f"🏷Цена товара: {price}")
             keyboard = [
                 [InlineKeyboardButton(f'✅Да', callback_data="add_to_list")],
@@ -249,19 +251,29 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         state["WANT_PRICE"] = False
         #driver.execute_script("window.stop();")
         #driver.close()
-    elif (state["HELP"]):
+    elif (state["ECHO"]):
         text = update.message.text
         await update.message.reply_text(f"{text}")
-        state["HELP"] = False
+        state["ECHO"] = False
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def echo_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("I will echo text now.")
-    state["HELP"] = True
+    state["ECHO"] = True
 
 async def start_waiting(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await daily_task()
 
 async def list_notifs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = get_user_by_nickname(connection, update.effective_user.full_name)[0]
+    request_ids = get_user_by_nickname(connection, update.effective_user.full_name)[2]
+    for request in request_ids:
+        await update.message.reply_text(get_request_by_id(connection, request)[1])
+    await daily_task()
+
+async def view_price_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    request_ids = get_user_by_nickname(connection, update.effective_user.full_name)[2]
+    for request in request_ids:
+        await update.message.reply_text(get_request_by_id(connection, request)[1])
     await daily_task()
 
 def main() -> None:
@@ -275,8 +287,9 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
-    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("echo", echo_command))
     application.add_handler(CommandHandler("wait", start_waiting, block=False))
+    application.add_handler(CommandHandler("list", list_notifs))
 
     application.run_polling()
     
