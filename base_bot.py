@@ -3,6 +3,17 @@ import aiohttp
 import json
 from datetime import datetime, timedelta
 
+import configparser
+
+def load_api_key(config_file):
+    config = configparser.ConfigParser()
+    config.read(config_file)
+
+    if "api" in config.sections() and "key" in config["api"]:
+        return config["api"]["key"]
+    else:
+        raise KeyError("API key not found in the configuration file")
+
 def get_current_date():
     current_date = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
     print(f"Current date: {current_date}")
@@ -68,8 +79,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-TELEGRAM_API_KEY = "6130313049:AAEO-bM2-RzwwxU9K8H0oKstApDGid3xh8w"
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -212,7 +221,9 @@ async def start_waiting(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 def main() -> None:
     global connection
-    application = Application.builder().token(TELEGRAM_API_KEY).build()
+    config_file = "config.cfg"
+    api_key = load_api_key(config_file)
+    application = Application.builder().token(api_key).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button))
