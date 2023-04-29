@@ -68,7 +68,9 @@ price_css_selectors = {
     "leroymerlin.ru": "._3ZkVWJ-JEE_pdp._2YOcEnUxeU_pdp", #https://leroymerlin.ru/product/ventilyator-napolnyy-monlan-mf-50sb-50-vt-52-sm-cvet-chernyy-84266575/
     "robo.market": ".styles__productPrice__6691", #https://robo.market/product/2982337
     "berito.ru": ".product__price", #https://www.berito.ru/product-plate-dlya-devochki-bombino-kiki-kids-430457/
-    "kazanexpress.ru": ".currency" #https://kazanexpress.ru/product/Plate-TVOE-1554788
+    "kazanexpress.ru": ".currency", #https://kazanexpress.ru/product/Plate-TVOE-1554788
+    "citilink.ru": ".app-catalog-1f8xctp", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
+    "pleer.ru": "price" #https://www.pleer.ru/_883840
 }
 
 #state
