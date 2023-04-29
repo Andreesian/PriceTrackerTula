@@ -54,7 +54,17 @@ stealth(driver,
         )
 
 search_css_selectors = {
-    "dns-shop.ru": ""
+    "dns-shop.ru": ".catalog-product__name.ui-link.ui-link_black", #https://www.dns-shop.ru/search/?q=rtx+3070&category=17a89aab16404e77
+    "wildberries.ru": ".product-card__link.j-card-link.j-open-full-product-card", #https://www.wildberries.ru/catalog/0/search.aspx?search=rtx%203070
+    "ozon.ru": ".tile-hover-target.yj4.jy5", #https://www.ozon.ru/category/videokarty-15721/?category_was_predicted=true&deny_category_prediction=true&from_global=true&text=rtx+3070
+    "lamoda.ru": "._root_clp6c_2._label_clp6c_17.x-product-card__pic.x-product-card__pic-catalog.x-product-card__pic.x-product-card__pic-catalog", #https://www.lamoda.ru/catalogsearch/result/?q=tommy&submit=y&gender_section=men
+    "cdek.shopping": ".digi-product__image-wrapper", #https://cdek.shopping/?digiSearch=true&term=force&params=%7Csort%3DDEFAULT
+    "leroymerlin.ru": ".bex6mjh_plp.b1f5t594_plp.iypgduq_plp.nf842wf_plp", #https://leroymerlin.ru/search/?q=обои&suggest=true
+    "robo.market": ".Product-module__imageWrapper__a729", #https://robo.market/catalog?text=iphone%2013&page_number=1
+    "berito.ru": ".snippet__photo-wrapper", #https://www.berito.ru/search/?query=платье
+    "kazanexpress.ru": ".subtitle-item", #https://kazanexpress.ru/search?query=iphone%2014%20pro%20max&needsCorrection=0
+    "citilink.ru": ".app-catalog-9gnskf.e1259i3g0", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
+    "pleer.ru": ".product_preview_img" #https://www.pleer.ru/search_iphone+13.html
 }
 
 price_css_selectors = {
@@ -64,14 +74,13 @@ price_css_selectors = {
     "ozon.ru": ".n4p", #https://www.ozon.ru/product/robot-pylesos-polaris-pvcr-1226-wi-fi-iq-home-gyro-chernyy-672452962/?avtc=1&avte=1&avts=1682763165&sh=rDKQSv7rkg ww
     "lamoda.ru": "._price_t2bk4_7", #https://www.lamoda.ru/p/mp002xm08jab/clothes-colins-bryuki/
     "cdek.shopping": ".final-your-price__count", #https://cdek.shopping/p/60245/kroscovki-nike-air-force-1-shadow-belyi
-    "leroymerlin.ru": "price.slot-container", #https://leroymerlin.ru/product/stul-premer-82x45x55-sm-derevo-cvet-belyy-84758318/
+    "leroymerlin.ru": ".price.slot-container", #https://leroymerlin.ru/product/stul-premer-82x45x55-sm-derevo-cvet-belyy-84758318/
     "leroymerlin.ru": "._3ZkVWJ-JEE_pdp._2YOcEnUxeU_pdp", #https://leroymerlin.ru/product/ventilyator-napolnyy-monlan-mf-50sb-50-vt-52-sm-cvet-chernyy-84266575/
     "robo.market": ".styles__productPrice__6691", #https://robo.market/product/2982337
     "berito.ru": ".product__price", #https://www.berito.ru/product-plate-dlya-devochki-bombino-kiki-kids-430457/
     "kazanexpress.ru": ".currency", #https://kazanexpress.ru/product/Plate-TVOE-1554788
     "citilink.ru": ".app-catalog-1f8xctp", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
-    "pleer.ru": "price", #https://www.pleer.ru/_883840 3
-    "onlinetrade.ru": ".js__actualPrice" #https://www.onlinetrade.ru/catalogue/kofemashiny-c1127/delonghi/kofemashina_delonghi_perfecta_evo_esam_420.40.b_0132217046-2415126.html
+    "pleer.ru": "price" #https://www.pleer.ru/_883840
 }
 
 #state
