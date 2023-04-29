@@ -61,11 +61,13 @@ price_css_selectors = {
     "dns-shop.ru": ".product-buy__price",
     "wildberries.ru": ".price-block__final-price", #https://www.wildberries.ru/catalog/18139480/detail.aspx
     "ozon.ru": ".np9", #https://www.ozon.ru/product/robot-pylesos-polaris-pvcr-1226-wi-fi-iq-home-gyro-chernyy-672452962/?avtc=1&avte=1&avts=1682763165&sh=rDKQSv7rkg
+    "ozon.ru": ".n4p", #https://www.ozon.ru/product/robot-pylesos-polaris-pvcr-1226-wi-fi-iq-home-gyro-chernyy-672452962/?avtc=1&avte=1&avts=1682763165&sh=rDKQSv7rkg
     "lamoda.ru": "._price_t2bk4_7", #https://www.lamoda.ru/p/mp002xm08jab/clothes-colins-bryuki/
     "cdek.shopping": ".final-your-price__count", #https://cdek.shopping/p/60245/kroscovki-nike-air-force-1-shadow-belyi
-    "leroymerlin.ru": "price.slot-container",
-    "robo.market": ".styles__productPrice__6691",
-    "berito.ru": ".product__price",
+    "leroymerlin.ru": "price.slot-container", #https://leroymerlin.ru/product/stul-premer-82x45x55-sm-derevo-cvet-belyy-84758318/
+    "leroymerlin.ru": "._3ZkVWJ-JEE_pdp._2YOcEnUxeU_pdp", #https://leroymerlin.ru/product/ventilyator-napolnyy-monlan-mf-50sb-50-vt-52-sm-cvet-chernyy-84266575/
+    "robo.market": ".styles__productPrice__6691", #https://robo.market/product/2982337
+    "berito.ru": ".product__price", #https://www.berito.ru/product-plate-dlya-devochki-bombino-kiki-kids-430457/
     "kazanexpress.ru": ".currency" #https://kazanexpress.ru/product/Plate-TVOE-1554788
 }
 
