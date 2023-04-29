@@ -1,3 +1,15 @@
+create table users
+(
+    id_user    bigint not null
+        constraint id_user
+            primary key,
+    nickname   varchar(150),
+    request_id bigint[]
+);
+
+alter table users
+    owner to postgres;
+
 create table urls
 (
     id_url     bigint not null
@@ -26,19 +38,3 @@ create table requests
 
 alter table requests
     owner to postgres;
-
-create table users
-(
-    id_user    bigint not null
-        constraint id_user
-            primary key,
-    nickname   varchar(150),
-    request_id bigint
-        constraint users_requests_null_fk
-            references requests
-            on update cascade on delete cascade
-);
-
-alter table users
-    owner to postgres;
-
