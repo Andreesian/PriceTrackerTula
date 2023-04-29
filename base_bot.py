@@ -107,6 +107,20 @@ search_css_selectors = {
 }
 
 
+query_css_selectors = {
+    "dns-shop.ru": "/search/?q=", #https://www.dns-shop.ru/search/?q=rtx+3070&category=17a89aab16404e77
+    "wildberries.ru": "/catalog/0/search.aspx?search=", #https://www.wildberries.ru/catalog/0/search.aspx?search=масло
+    "ozon.ru": "/search/?text=", #https://www.ozon.ru/search/?text=масло&from_global=true
+    "lamoda.ru": "/catalogsearch/result/?q=", #https://www.lamoda.ru/catalogsearch/result/?q=tommy&submit=y&gender_section=men
+    "cdek.shopping": "/?digiSearch=true&term=", #https://cdek.shopping/p/60245/kroscovki-nike-air-force-1-shadow-belyi
+    "leroymerlin.ru": "/search/?q=", #https://leroymerlin.ru/search/?q=обои&suggest=true
+    "robo.market": "/catalog?text=", #https://robo.market/catalog?text=Белый&page_number=1
+    "berito.ru": "/search/?query=", #https://www.berito.ru/search/?query=Белый
+    "kazanexpress.ru": "/search?query=", #https://kazanexpress.ru/search?query=белый&needsCorrection=0
+    "citilink.ru": "/search/?text=", #https://www.citilink.ru/search/?text=белый
+    "pleer.ru": "/search_" #https://www.pleer.ru/search_белый.html
+}
+
 price_css_selectors = {
     "dns-shop.ru": ".product-buy__price",
     "wildberries.ru": ".price-block__final-price", #https://www.wildberries.ru/catalog/18139480/detail.aspx
