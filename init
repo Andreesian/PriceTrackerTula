@@ -4,7 +4,8 @@ create table users
         constraint id_user
             primary key,
     nickname   varchar(150),
-    request_id bigint[]
+    request_id bigint[],
+    state      integer default 0
 );
 
 alter table users
@@ -38,3 +39,4 @@ create table requests
 
 alter table requests
     owner to postgres;
+
