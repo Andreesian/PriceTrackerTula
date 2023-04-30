@@ -13,14 +13,9 @@ def generate_unique_id(num_bits=63):
     return secrets.randbits(num_bits)
 
 def trim_currency(text):
-    # Use a regex pattern to match any character that is not a digit or a decimal point
     pattern = r'[^\d]'
     trimmed_text = re.sub(pattern, '', text)
-
-    # Find the position of the decimal point (if any)
     decimal_index = trimmed_text.find('.')
-
-    # If a decimal point is found, remove it and any digits after it
     if decimal_index != -1:
         trimmed_text = trimmed_text[:decimal_index]
 
@@ -46,18 +41,14 @@ def load_db_cfg(config_file):
 
 def get_current_date():
     current_date = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
-    print(f"Current date: {current_date}")
 
 async def daily_task():
     while True:
         get_current_date()
         current_time = datetime.utcnow()
         next_run_time = (current_time + timedelta(seconds=5)).replace(hour=0, minute=0, second=0, microsecond=0)
-        sleep_duration = 5
-
-        print(f"Sleeping for {sleep_duration} seconds")
+        sleep_duration = 3600
         await asyncio.sleep(sleep_duration)
-        print(f"sleeped")
 
 from database import (
     get_user_state_by_id,
@@ -117,7 +108,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Set up Selenium
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
@@ -144,7 +134,7 @@ search_css_selectors = {
     "berito.ru": ".snippet__photo-wrapper", #https://www.berito.ru/search/?query=платье
     "kazanexpress.ru": ".subtitle-item", #https://kazanexpress.ru/search?query=iphone%2014%20pro%20max&needsCorrection=0
     "citilink.ru": ".app-catalog-9gnskf.e1259i3g0", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
-    "pleer.ru": ".product_preview_img" #https://www.pleer.ru/search_iphone+13.html
+    "pleer.ru": ".product_info" #https://www.pleer.ru/search_iphone+13.html
 }
 
 image_css_selectors = {
@@ -172,7 +162,7 @@ product_name_css_selectors = {
     "berito.ru": ".page-header__title", #https://www.berito.ru/product-plate-v-goroshek-noname-4411163/
     "kazanexpress.ru": ".info-block.base h1", #https://kazanexpress.ru/product/Belaya-krem---1742409
     "citilink.ru": ".e1ubbx7u0.eml1k9j0.app-catalog-tn2wxd.e1gjr6xo0", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
-    "pleer.ru": ".product_title" #https://www.pleer.ru/_653047
+    "pleer.ru": ".product_info a.href" #https://www.pleer.ru/_653047
 }
 
 query_css_selectors = {
@@ -205,7 +195,6 @@ price_css_selectors = {
     "pleer.ru": ".price" #https://www.pleer.ru/_883840
 }
 
-#state
 state = {
     "START" : False,
     "ECHO" : False,
@@ -230,19 +219,19 @@ unique_id = id_generator()
 
 async def fetch_item_name(url: str, css_selector: str) -> str:
     driver.get(url)
-    element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+    element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
     name = element.text.strip()
     return name
 
 async def fetch_first_item_url(url: str, css_selector: str) -> str:
     driver.get(url)
-    element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
-    item_url = element.text.strip()
-    return item_url
+    element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+    href = element.get_attribute("href")
+    return href
 
 async def fetch_price(url: str, css_selector: str) -> str:
     driver.get(url)
-    element = WebDriverWait(driver, 30).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+    element = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
     price = element.text.strip()
     return price
 
@@ -266,27 +255,30 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("Выберите категорию либо ввод по ссылке:", reply_markup=reply_markup)
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Parses the CallbackQuery and updates the message text."""
     global connection
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text(text=f"Selected option: {query.data}")
+    #await query.edit_message_text(text=f"Selected option: {query.data}")
     if (query.data == "link"):
+        await query.edit_message_text(text=f"🗒Введите ссылку на товар:")
         state["WANT_PRICE_LINK"] = True
     if (query.data == "add_to_list"):
         request_id_toadd = generate_unique_id()
         new_reqs = get_user_by_nickname(connection, update.effective_user.full_name)[2]
-        print(new_reqs)
         new_reqs.append(request_id_toadd)
-        print(new_reqs)
         add_request(connection, request_id_toadd, swap_value[update.effective_user.full_name][0], "1 day", [int(trim_currency(swap_value[update.effective_user.full_name][2]))], get_url_by_url(connection, swap_value[update.effective_user.full_name][1])[0])
         update_user(connection, get_user_by_nickname(connection, update.effective_user.full_name)[0], new_request_ids=new_reqs)
         await query.edit_message_text(text=f"✅Товар добавлен в ваш список уведомлений!")
-    elif (query.data == 'general'):
+    if (query.data == "dont_add_to_list"):
+        await query.edit_message_text(text=f"❌Товар не был добавлен в ваш список уведомлений")
+    if (query.data == 'tech'):
         state["WANT_PRICE_QUERY"] = True
-        await query.edit_message_text(text=f"✅Введите название товара")
+        await query.edit_message_text(text=f"🗒Введите название товара:")
+    if (query.data == 'daily'):
+        await query.edit_message_text(text=f"✅Частота обновления установлена на: ежедневно")
+    if (query.data == 'weekly'):
+        await query.edit_message_text(text=f"✅Частота обновления установлена на: еженедельно")
 
-# Define a function to handle messages
 async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     global swap_value
     if (state["WANT_PRICE_LINK"]):
@@ -323,11 +315,38 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         state["ECHO"] = False
     elif (state["WANT_PRICE_QUERY"]):
         text = update.message.text
-        url = "lamoda.ru/catalogsearch/result/?q=" + text
-        await update.message.reply_text(f"{search_css_selectors['lamoda.ru']}")
-        
-        item_url = await fetch_first_item_url(url, search_css_selectors['lamoda.ru'])
-        await update.message.reply_text(f"{item_url}")
+        await update.message.reply_text(f"⚙Загружаем товары с площадок... (Это может занять некоторое время...)")
+        await update.message.reply_text(f"❗Пока идет поиск, предлагаем вам предложение от наших партнеров!")
+        item_url = []
+        url = "https://dns-shop.ru/search/?q=" + text
+        #await update.message.reply_text(f"{search_css_selectors['dns-shop.ru']}")
+        item_url.append(await fetch_first_item_url(url, search_css_selectors['dns-shop.ru']))
+        #await update.message.reply_text(f"{item_url}")
+        url = "https://www.citilink.ru/search/?text=" + text
+        #await update.message.reply_text(f"{search_css_selectors['citilink.ru']}")
+        item_url.append(await fetch_first_item_url(url, search_css_selectors['citilink.ru']))
+        #await update.message.reply_text(f"{item_url}")
+        url = "https://www.wildberries.ru/catalog/0/search.aspx?search=" + text
+        #await update.message.reply_text(f"{search_css_selectors['citilink.ru']}")
+        item_url.append(await fetch_first_item_url(url, search_css_selectors['wildberries.ru']))
+        #await update.message.reply_text(f"{item_url}")
+        await update.message.reply_text(f"⚙Загружаем цены с площадок...")
+        prices = []
+        prices.append(await fetch_price(item_url[0], price_css_selectors['dns-shop.ru']))
+        prices.append(await fetch_price(item_url[1], price_css_selectors['citilink.ru']))
+        prices.append(await fetch_price(item_url[2], price_css_selectors['wildberries.ru']))
+        final = ""
+        final += "🏷Цена в DNS: " + prices[0] + "\n"
+        final += "🏷Цена в Citilink: " + prices[1] + "₽\n"
+        final += "🏷Цена в Wildberries: " + prices[2] + "\n"
+        await update.message.reply_text(f"{final}")
+        keyboard = [
+            [InlineKeyboardButton(f'✅Да', callback_data="add_to_list")],
+            [InlineKeyboardButton(f'❌Нет', callback_data="dont_add_to_list")],
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("🔔Желаете ли вы добавить этот товар в список ваших уведомлений?", reply_markup=reply_markup)
+        state["WANT_PRICE_QUERY"] = False
 
 async def echo_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("I will echo text now.")
@@ -347,6 +366,14 @@ async def view_price_history(update: Update, context: ContextTypes.DEFAULT_TYPE)
     for request in request_ids:
         await update.message.reply_text(get_request_by_id(connection, request)[1])
 
+async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    keyboard = [
+            [InlineKeyboardButton(f'🕑Ежедневно (💸Только премиум подписка)', callback_data="daily")],
+            [InlineKeyboardButton(f'🕑Еженедельно', callback_data="weekly")],
+        ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("❓Как часто следует проверять ваши товары на изменение цены?", reply_markup=reply_markup)
+
 def main() -> None:
     global connection
     config_file = "config.cfg"
@@ -356,11 +383,13 @@ def main() -> None:
     application = Application.builder().token(api_key).build()
 
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("add", start))
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
     application.add_handler(CommandHandler("echo", echo_command))
     application.add_handler(CommandHandler("wait", start_waiting, block=False))
     application.add_handler(CommandHandler("list", list_notifs))
+    application.add_handler(CommandHandler("settings", settings))
 
     application.run_polling()
     
