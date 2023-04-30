@@ -5,6 +5,27 @@ from datetime import datetime, timedelta
 
 import configparser
 
+import re
+
+import secrets
+
+def generate_unique_id(num_bits=63):
+    return secrets.randbits(num_bits)
+
+def trim_currency(text):
+    # Use a regex pattern to match any character that is not a digit or a decimal point
+    pattern = r'[^\d]'
+    trimmed_text = re.sub(pattern, '', text)
+
+    # Find the position of the decimal point (if any)
+    decimal_index = trimmed_text.find('.')
+
+    # If a decimal point is found, remove it and any digits after it
+    if decimal_index != -1:
+        trimmed_text = trimmed_text[:decimal_index]
+
+    return trimmed_text
+
 def load_api_key(config_file):
     config = configparser.ConfigParser()
     config.read(config_file)
@@ -39,6 +60,7 @@ async def daily_task():
         print(f"sleeped")
 
 from database import (
+    get_user_state_by_id,
     get_user_by_nickname,
     get_request_by_product_name,
     get_url_by_url,
@@ -57,8 +79,6 @@ from database import (
     delete_request,
     delete_url
 )
-
-
 
 from urllib.parse import urlparse
 
@@ -150,11 +170,10 @@ product_name_css_selectors = {
     "leroymerlin.ru": ".t12nw7s2_pdp", #https://leroymerlin.ru/product/ventilyator-napolnyy-monlan-mf-50sb-50-vt-52-sm-cvet-chernyy-84266575/
     "robo.market": ".styles__productArticleTitle__8e33", #https://robo.market/product/1807193
     "berito.ru": ".page-header__title", #https://www.berito.ru/product-plate-v-goroshek-noname-4411163/
-    "kazanexpress.ru": ".title", #https://kazanexpress.ru/product/Belaya-krem---1742409
+    "kazanexpress.ru": ".info-block.base h1", #https://kazanexpress.ru/product/Belaya-krem---1742409
     "citilink.ru": ".e1ubbx7u0.eml1k9j0.app-catalog-tn2wxd.e1gjr6xo0", #https://www.citilink.ru/product/videokarta-msi-nvidia-geforce-rtx-3060-rtx-3060-ventus-2x-12g-oc-12gb-1475891/
     "pleer.ru": ".product_title" #https://www.pleer.ru/_653047
 }
-
 
 query_css_selectors = {
     "dns-shop.ru": "/search/?q=", #https://www.dns-shop.ru/search/?q=rtx+3070&category=17a89aab16404e77
@@ -194,6 +213,13 @@ state = {
     "WANT_PRICE_QUERY" : False
 }
 
+state_dict = {
+    0 : "START",
+    1 : "TEST"
+}
+
+swap_value = {}
+
 def id_generator():
     id_value = 0
     while True:
@@ -225,7 +251,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     username = user.full_name
     if get_user_by_nickname(connection, user.full_name) == None:
-        add_user(connection, next(unique_id), username)
+        add_user(connection, generate_unique_id(), username)
     keyboard = [
         [InlineKeyboardButton("📦Общее", callback_data="general")],
         [InlineKeyboardButton("👖Одежда и обувь", callback_data="cloth")],
@@ -236,36 +262,42 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         [InlineKeyboardButton("🧸Детское", callback_data="child")],
         [InlineKeyboardButton("🌐Ссылка", callback_data="link")],
     ]
-
     reply_markup = InlineKeyboardMarkup(keyboard)
-
     await update.message.reply_text("Выберите категорию либо ввод по ссылке:", reply_markup=reply_markup)
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Parses the CallbackQuery and updates the message text."""
     global connection
     query = update.callback_query
-    state["WANT_PRICE"] = True
-
     await query.answer()
-
     await query.edit_message_text(text=f"Selected option: {query.data}")
+    if (query.data == "link"):
+        state["WANT_PRICE_LINK"] = True
     if (query.data == "add_to_list"):
-        add_request(connection, next(unique_id), "default", "1 day", [], 1)
-        update_user(connection, next(unique_id), new_request_ids=[get_request_by_id(connection, 1)[0]])
+        request_id_toadd = generate_unique_id()
+        new_reqs = get_user_by_nickname(connection, update.effective_user.full_name)[2]
+        print(new_reqs)
+        new_reqs.append(request_id_toadd)
+        print(new_reqs)
+        add_request(connection, request_id_toadd, swap_value[update.effective_user.full_name][0], "1 day", [int(trim_currency(swap_value[update.effective_user.full_name][2]))], get_url_by_url(connection, swap_value[update.effective_user.full_name][1])[0])
+        update_user(connection, get_user_by_nickname(connection, update.effective_user.full_name)[0], new_request_ids=new_reqs)
         await query.edit_message_text(text=f"✅Товар добавлен в ваш список уведомлений!")
+    elif (query.data == 'general'):
+        state["WANT_PRICE_QUERY"] = True
+        await query.edit_message_text(text=f"✅Введите название товара")
 
 # Define a function to handle messages
 async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if (state["WANT_PRICE"]):
+    global swap_value
+    if (state["WANT_PRICE_LINK"]):
         try:
             url = update.message.text
             domain = get_domain_name(url)
             price_css_selector = price_css_selectors[domain]
-            #name_css_selector = name_css_selector
+            name_css_selector = product_name_css_selectors[domain]
             await update.message.reply_text(f"⚙Загружаем цены...")
-            #name = await fetch_item_name(url, name_css_selector)
-            #await update.message.reply_text(f"🏷Название товара: {name}")
+            name = await fetch_item_name(url, name_css_selector)
+            await update.message.reply_text(f"🏷Название товара: {name}")
             price = await fetch_price(url, price_css_selector)
             await update.message.reply_text(f"🏷Цена товара: {price}")
             keyboard = [
@@ -273,7 +305,13 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 [InlineKeyboardButton(f'❌Нет', callback_data="dont_add_to_list")],
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
+            if (get_url_by_url(connection, url)) == None:
+                add_url(connection, generate_unique_id(), url, name)
             await update.message.reply_text("🔔Желаете ли вы добавить этот товар в список ваших уведомлений?", reply_markup=reply_markup)
+            swap_value[update.effective_user.full_name] = []
+            swap_value[update.effective_user.full_name].append(name)
+            swap_value[update.effective_user.full_name].append(url)
+            swap_value[update.effective_user.full_name].append(price)
         except Exception as e:
             await update.message.reply_text(f"Error: {e}")
         state["WANT_PRICE"] = False
@@ -283,6 +321,13 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         text = update.message.text
         await update.message.reply_text(f"{text}")
         state["ECHO"] = False
+    elif (state["WANT_PRICE_QUERY"]):
+        text = update.message.text
+        url = "lamoda.ru/catalogsearch/result/?q=" + text
+        await update.message.reply_text(f"{search_css_selectors['lamoda.ru']}")
+        
+        item_url = await fetch_first_item_url(url, search_css_selectors['lamoda.ru'])
+        await update.message.reply_text(f"{item_url}")
 
 async def echo_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("I will echo text now.")
@@ -296,13 +341,11 @@ async def list_notifs(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     request_ids = get_user_by_nickname(connection, update.effective_user.full_name)[2]
     for request in request_ids:
         await update.message.reply_text(get_request_by_id(connection, request)[1])
-    await daily_task()
 
 async def view_price_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     request_ids = get_user_by_nickname(connection, update.effective_user.full_name)[2]
     for request in request_ids:
         await update.message.reply_text(get_request_by_id(connection, request)[1])
-    await daily_task()
 
 def main() -> None:
     global connection
@@ -321,7 +364,6 @@ def main() -> None:
 
     application.run_polling()
     
-
 if __name__ == "__main__":
     
     main()

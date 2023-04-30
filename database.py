@@ -104,6 +104,12 @@ def get_url_by_url(connection: psycopg2.extensions.connection, url: str) -> Opti
         result = cursor.fetchone()
     return result
 
+def get_user_state_by_id(connection: psycopg2.extensions.connection, id_user: int) -> Optional[str]:
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT state FROM public.users WHERE id_user = %s", (id_user,))
+        result = cursor.fetchone()
+    return result[0] if result else None
+
 # Example usage
 """ connection = create_connection("sell_bot", "postgres", "Alesha2109!", "localhost", "5432")
 
